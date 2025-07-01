@@ -19,7 +19,7 @@ const Map: React.FC = () => {
         }
     }, []);
 
-    return <div ref={mapContainerRef} style={{ width: '100%', height: '400px' }} />;
+    return <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />;
 };
     
 export default Map;
