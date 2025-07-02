@@ -1,7 +1,14 @@
 import React, { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl'; // or "const mapboxgl = require('mapbox-gl');"
 
-mapboxgl.accessToken = 'pk.eyJ1Ijoic2thbW1hbGEiLCJhIjoiY21ja3l6bmk5MDV4dDJtcHR6OXAydWFsNyJ9.-uxtMA0LcJHIKk7laIdKnQ';
+// Get the API key from environment variables
+const mapboxAccessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+
+if (!mapboxAccessToken) {
+  throw new Error('REACT_APP_MAPBOX_ACCESS_TOKEN is not defined in environment variables');
+}
+
+mapboxgl.accessToken = mapboxAccessToken;
 
 const Map: React.FC = () => {
     const mapContainerRef = useRef<HTMLDivElement | null>(null);
