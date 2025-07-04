@@ -51,7 +51,8 @@ export class DirectionsService {
       const response = await axios.post(
         this.baseUrl,
         {
-          coordinates
+          coordinates,
+          elevation: true
         },
         {
           headers: {
