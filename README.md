@@ -1,6 +1,6 @@
 # 🚴 Cycling App
 
-A comprehensive application for cyclists that integrates maps, routing tools, and crowdsourced data for reporting obstacles, traffic, and weather conditions.
+A comprehensive application for cyclists that integrates maps, routing tools, community features, and crowdsourced data for reporting obstacles, traffic, and weather conditions.
 
 ## 🏗️ Project Structure
 
