@@ -5,6 +5,7 @@ import { User } from 'firebase/auth';
 const AuthButton: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showSignOut, setShowSignOut] = useState(false);
 
   useEffect(() => {
     // Set initial user state
@@ -13,6 +14,7 @@ const AuthButton: React.FC = () => {
     // Listen for auth state changes
     const unsubscribe = onAuthStateChange((user) => {
       setUser(user);
+      setShowSignOut(false); // Hide dropdown when user changes
     });
 
     return () => unsubscribe();
@@ -33,11 +35,26 @@ const AuthButton: React.FC = () => {
     try {
       setLoading(true);
       await signOutUser();
+      setShowSignOut(false);
     } catch (error) {
       console.error('Sign out failed:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleSignOut = () => {
+    setShowSignOut(!showSignOut);
+  };
+
+  const getFirstName = (displayName: string | null, email: string | null): string => {
+    if (displayName) {
+      return displayName.split(' ')[0];
+    }
+    if (email) {
+      return email.split('@')[0];
+    }
+    return 'User';
   };
 
   return (
@@ -46,56 +63,142 @@ const AuthButton: React.FC = () => {
       top: '10px',
       right: '10px',
       zIndex: 1000,
-      background: 'rgba(255, 255, 255, 0.9)',
-      padding: '10px',
-      borderRadius: '5px',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
     }}>
       {user ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <img 
-            src={user.photoURL || undefined} 
-            alt="Profile" 
-            style={{ 
-              width: '32px', 
-              height: '32px', 
-              borderRadius: '50%' 
-            }} 
-          />
-          <span style={{ fontSize: '14px' }}>
-            {user.displayName || user.email}
-          </span>
-          <button 
-            onClick={handleSignOut}
-            disabled={loading}
+        <div style={{ position: 'relative' }}>
+          {/* User info - clickable */}
+          <div 
+            onClick={toggleSignOut}
             style={{
-              padding: '8px 16px',
-              backgroundColor: '#dc3545',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              fontSize: '12px'
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              background: 'rgba(255, 255, 255, 0.95)',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              border: '1px solid rgba(0,0,0,0.1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
             }}
           >
-            {loading ? 'Signing out...' : 'Sign Out'}
-          </button>
+            <img 
+              src={user.photoURL || undefined} 
+              alt="Profile" 
+              style={{ 
+                width: '36px', 
+                height: '36px', 
+                borderRadius: '50%',
+                border: '2px solid #fff',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }} 
+            />
+            <span style={{ 
+              fontSize: '15px',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+              fontWeight: '500',
+              color: '#2c3e50',
+              letterSpacing: '0.3px'
+            }}>
+              Welcome, {getFirstName(user.displayName, user.email)} 🚴
+            </span>
+            <svg 
+              width="12" 
+              height="12" 
+              viewBox="0 0 24 24"
+              style={{
+                transition: 'transform 0.2s ease',
+                transform: showSignOut ? 'rotate(180deg)' : 'rotate(0deg)'
+              }}
+            >
+              <path fill="#2c3e50" d="M7 10l5 5 5-5z"/>
+            </svg>
+          </div>
+
+          {/* Sign out dropdown */}
+          {showSignOut && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              right: '0',
+              marginTop: '4px',
+              background: 'rgba(255, 255, 255, 0.98)',
+              borderRadius: '8px',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+              border: '1px solid rgba(0,0,0,0.1)',
+              overflow: 'hidden',
+              animation: 'slideDown 0.2s ease'
+            }}>
+              <button 
+                onClick={handleSignOut}
+                disabled={loading}
+                style={{
+                  padding: '12px 20px',
+                  backgroundColor: 'transparent',
+                  color: '#dc3545',
+                  border: 'none',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  width: '100%',
+                  textAlign: 'left',
+                  transition: 'background-color 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(220, 53, 69, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+                {loading ? 'Signing out...' : 'Sign Out'}
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <button 
           onClick={handleSignIn}
           disabled={loading}
           style={{
-            padding: '10px 20px',
+            padding: '12px 20px',
             backgroundColor: '#4285f4',
             color: 'white',
             border: 'none',
-            borderRadius: '4px',
+            borderRadius: '8px',
             cursor: loading ? 'not-allowed' : 'pointer',
             fontSize: '14px',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
+            boxShadow: '0 2px 8px rgba(66, 133, 244, 0.3)',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            if (!loading) {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(66, 133, 244, 0.4)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!loading) {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(66, 133, 244, 0.3)';
+            }
           }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24">
@@ -107,6 +210,21 @@ const AuthButton: React.FC = () => {
           {loading ? 'Signing in...' : 'Sign in with Google'}
         </button>
       )}
+
+      <style>
+        {`
+          @keyframes slideDown {
+            from {
+              opacity: 0;
+              transform: translateY(-10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
     </div>
   );
 };
