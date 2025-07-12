@@ -4,38 +4,41 @@
     "description": "Cycling app with maps, routing, and crowdsourced obstacle reporting",
     "homepage": "https://github.com/skammala/my-cycling-project#readme",
     "bugs": {
-      "url": "https://github.com/skammala/my-cycling-project/issues"
+        "url": "https://github.com/skammala/my-cycling-project/issues"
     },
     "repository": {
-      "type": "git",
-      "url": "git+https://github.com/skammala/my-cycling-project.git"
+        "type": "git",
+        "url": "git+https://github.com/skammala/my-cycling-project.git"
     },
     "license": "ISC",
     "author": "Shiva Kammala",
     "private": true,
     "workspaces": [
-      "client",
-      "server",
-      "shared"
+        "client",
+        "server",
+        "shared"
     ],
     "scripts": {
-      "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-      "dev:client": "npm run dev --workspace=client",
-      "dev:server": "npm run dev --workspace=server",
-      "build": "npm run build --workspaces",
-      "build:client": "npm run build --workspace=client",
-      "build:server": "npm run build --workspace=server",
-      "install:all": "npm install && npm install --workspace=client && npm install --workspace=server",
-      "test": "npm run test --workspaces",
-      "lint": "npm run lint --workspaces",
-      "clean": "npm run clean --workspaces && rm -rf node_modules"
+        "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+        "dev:client": "npm run dev --workspace=client",
+        "dev:server": "npm run dev --workspace=server",
+        "build": "npm run build --workspaces",
+        "build:client": "npm run build --workspace=client",
+        "build:server": "npm run build --workspace=server",
+        "install:all": "npm install && npm install --workspace=client && npm install --workspace=server",
+        "test": "npm run test --workspaces",
+        "lint": "npm run lint --workspaces",
+        "clean": "npm run clean --workspaces && rm -rf node_modules"
     },
     "devDependencies": {
-      "concurrently": "^8.2.2",
-      "typescript": "^5.0.0"
+        "concurrently": "^8.2.2",
+        "typescript": "^5.0.0"
     },
     "engines": {
-      "node": ">=18.0.0",
-      "npm": ">=9.0.0"
+        "node": ">=18.0.0",
+        "npm": ">=9.0.0"
+    },
+    "dependencies": {
+        "@react-google-maps/api": "^2.20.7"
     }
-  }
+}
