@@ -120,9 +120,12 @@ const RouteInput: React.FC<RouteInputProps> = ({ map, onRouteUpdate }) => {
           return bounds.extend(coord as [number, number]);
         }, new mapboxgl.LngLatBounds(coordinates[0] as [number, number], coordinates[0] as [number, number]));
 
+        // Preserve current pitch when fitting bounds
+        const currentPitch = map.getPitch();
         map.fitBounds(bounds, {
           padding: 50,
-          duration: 1000
+          duration: 1000,
+          pitch: currentPitch // Preserve the current pitch
         });
 
         if (onRouteUpdate) {
