@@ -46,6 +46,21 @@ const RouteInput: React.FC<RouteInputProps> = ({ map, onRouteUpdate }) => {
     }
   };
 
+  // Clear route and reset search boxes
+  const handleClear = () => {
+    setStartCoordinates(null);
+    setEndCoordinates(null);
+    setError(null);
+    if (startInputRef.current) startInputRef.current.value = '';
+    if (endInputRef.current) endInputRef.current.value = '';
+    if (map) {
+      if (map.getSource('route')) {
+        map.removeLayer('route');
+        map.removeSource('route');
+      }
+    }
+  };
+
   // Function to fetch and display route
   const fetchRoute = async () => {
     if (!startCoordinates || !endCoordinates) {
@@ -105,9 +120,12 @@ const RouteInput: React.FC<RouteInputProps> = ({ map, onRouteUpdate }) => {
           return bounds.extend(coord as [number, number]);
         }, new mapboxgl.LngLatBounds(coordinates[0] as [number, number], coordinates[0] as [number, number]));
 
+        // Preserve current pitch when fitting bounds
+        const currentPitch = map.getPitch();
         map.fitBounds(bounds, {
           padding: 50,
-          duration: 1000
+          duration: 1000,
+          pitch: currentPitch // Preserve the current pitch
         });
 
         if (onRouteUpdate) {
@@ -178,7 +196,7 @@ const RouteInput: React.FC<RouteInputProps> = ({ map, onRouteUpdate }) => {
             }}
           />
         </Autocomplete>
-        {/* Route status indicators - positioned below search boxes */}
+        {/* Route status indicators and buttons - positioned below search boxes */}
         <div style={{
           position: 'absolute',
           top: '100%',
@@ -218,33 +236,60 @@ const RouteInput: React.FC<RouteInputProps> = ({ map, onRouteUpdate }) => {
             </div>
           )}
 
-          {/* Manual route button */}
+          {/* Manual route and clear buttons */}
           {startCoordinates && endCoordinates && !isLoading && (
-            <button
-              onClick={fetchRoute}
-              style={{
-                background: 'rgba(0, 124, 191, 0.9)',
-                color: '#2c3e50',
-                border: 'none',
-                padding: '8px 12px',
-                borderRadius: '6px',
-                fontSize: '12px',
-                fontWeight: '500',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                letterSpacing: '0.3px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                alignSelf: 'flex-start'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(0, 124, 191, 1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(0, 124, 191, 0.9)';
-              }}
-            >
-              🚴 Recalculate Route
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', alignItems: 'center' }}>
+              <button
+                onClick={fetchRoute}
+                style={{
+                  background: 'rgba(0, 124, 191, 0.9)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                  letterSpacing: '0.3px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  alignSelf: 'flex-start'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(0, 124, 191, 1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(0, 124, 191, 0.9)';
+                }}
+              >
+                🚴 Recalculate Route
+              </button>
+              <button
+                onClick={handleClear}
+                title="Clear route and reset search"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  background: '#dc3545',
+                  border: 'none',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(220,53,69,0.15)',
+                  transition: 'background 0.2s',
+                  outline: 'none'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = '#b52a37'}
+                onMouseLeave={e => e.currentTarget.style.background = '#dc3545'}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24">
+                  <line x1="6" y1="6" x2="18" y2="18" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                  <line x1="18" y1="6" x2="6" y2="18" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
           )}
         </div>
       </div>
